@@ -1,6 +1,6 @@
 import { execSync } from 'child_process';
 import {resolve} from 'dns'
-import fetch from "node-fetch";
+// import fetch from "node-fetch";
 
 const url_base =  'https://art.victorytime.games'
 const url_login = '/api/user/login'
