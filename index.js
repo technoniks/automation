@@ -63,65 +63,65 @@ network.then(async connected => {
   const loginData = await userLogin(user, pass)
   app_token = loginData['userinfo']['token']
   while (true) {
-    try {
-      const gameData = await gameNow()
-      const game_sn = gameData['sn']
-      const game_date = gameData['date']
-      const game_id = gameData['id']
-      const user_balance = gameData['user_money']
-
-      if ( !init_balance ) init_balance = user_balance
-
-      const orders = await getLatestOrders()
-      const lastOrder = orders['list'].reduce((acc, current) => {
-        const currentNumber = Number(current['date'] +''+ current['sn'])
-        const accNumber = Number(acc['date'] +''+ acc['sn'])
-        // if(currentNumber == game_date + '' + game_sn) {
-        //   acc['current'] = current
-        // }
-        // if(currentNumber == game_date + '' + game_sn) {
-        //   acc['last'] = current
-        // }
-        if ( !acc ) {
-          acc = current
-        }else {
-          if (currentNumber > accNumber) {
+    const time = new Date().getHours()
+    if (time > 10 && time < 22) {
+      try {
+        const gameData = await gameNow()
+        const game_sn = gameData['sn']
+        const game_date = gameData['date']
+        const game_id = gameData['id']
+        const user_balance = gameData['user_money']
+  
+        if ( !init_balance ) init_balance = user_balance
+  
+        const orders = await getLatestOrders()
+        const lastOrder = orders['list'].reduce((acc, current) => {
+          const currentNumber = Number(current['date'] +''+ current['sn'])
+          const accNumber = Number(acc['date'] +''+ acc['sn'])
+  
+          if ( !acc ) {
             acc = current
-          }
-        }
-        return acc
-      })
-
-      if ( lastOrder['sn'] !== game_sn ) {
-        let orderQty = 0
-        if ( lastOrder['status'] == 1 ) {
-          orderQty = 1
-        }
-        if ( lastOrder['status'] == 2 ) {
-          console.log("here: ", lastOrder);
-          const lastOrderQty = lastOrder['contract_number'] 
-          orderQty = lastOrderQty * 2
-        }
-        if ( lastOrder['status'] != 0 ) {
-          const data = await addOrder(game_id, orderQty, 'green')
-          if ( data['msg'] === 'success' ) {
-            console.log("order place successfully");
-            console.log("orderQty: ", orderQty);
           }else {
-            console.log("msg: ",data['msg']);
+            if (currentNumber > accNumber) {
+              acc = current
+            }
           }
+          return acc
+        })
+  
+        if ( lastOrder['sn'] !== game_sn ) {
+          let orderQty = 0
+          if ( lastOrder['status'] == 1 ) {
+            orderQty = 1
+          }
+          if ( lastOrder['status'] == 2 ) {
+            // console.log("here: ", lastOrder);
+            const lastOrderQty = lastOrder['contract_number'] 
+            orderQty = lastOrderQty * 2
+          }
+          if ( lastOrder['status'] != 0 ) {
+            const data = await addOrder(game_id, orderQty, 'green')
+            if ( data['msg'] === 'success' ) {
+              console.log("order place successfully");
+              console.log("orderQty: ", orderQty);
+            }else {
+              console.log("msg: ",data['msg']);
+            }
+          }
+        }else {
+          console.clear()
+          console.log("Balance: ", user_balance);
+          console.log("P/L : Rs.", user_balance - init_balance);
+          console.log("Waiting for result ...");
         }
-      }else {
-        console.clear()
-        console.log("Balance: ", user_balance);
-        console.log("P/L : Rs.", user_balance - init_balance);
-        console.log("Waiting for result ...");
+      }catch (error) {
+        console.log("error: ",error);
+        execSync('sleep 3')
       }
-    }catch (error) {
-      console.log("error: ",error);
-      execSync('sleep 3')
+      execSync('sleep 10')
+    }else {
+      execSync('sleep 600')
     }
-    execSync('sleep 10')
   }
 })
 // userLogin(user, pass, loginData => {
