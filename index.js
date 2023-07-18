@@ -64,7 +64,7 @@ network.then(async connected => {
   app_token = loginData['userinfo']['token']
   while (true) {
     const time = new Date().getHours()
-    if (time > 10 && time < 22) {
+    if (time > 9 && time < 22) {
       try {
         const gameData = await gameNow()
         const game_sn = gameData['sn']
